@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MARGIX - Smart Road Monitoring</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Google Maps -->
+    <script async
+        src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMap">
+    </script>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+
+<header class="topbar">
+
+    <div class="logo">
+        <span>🚧</span>
+        <div>
+            <h1>MARGIX</h1>
+            <p>Smart Road Monitoring</p>
+        </div>
+    </div>
+
+    <div class="header-right">
+        <span class="live-dot"></span>
+        <span>System Online</span>
+    </div>
+
+</header>
+
+
+<!-- ================= MAIN ================= -->
+
+<div class="app-container">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <h2>Navigation</h2>
+
+        <button class="nav-btn active" onclick="showSection('dashboard')">
+            📊 Dashboard
+        </button>
+
+        <button class="nav-btn" onclick="showSection('hazards')">
+            🚧 Hazards
+        </button>
+
+        <button class="nav-btn" onclick="showSection('amenities')">
+            🏥 Nearby Amenities
+        </button>
+
+        <hr>
+
+        <h2>Map Filters</h2>
+
+        <button class="filter-btn" onclick="showHazards('all')">
+            🌐 All Hazards
+        </button>
+
+        <button class="filter-btn" onclick="showHazards('Pothole')">
+            🔴 Potholes
+        </button>
+
+        <button class="filter-btn" onclick="showHazards('Open Manhole')">
+            🟠 Open Manholes
+        </button>
+
+        <button class="filter-btn" onclick="showHazards('Road Crack')">
+            🟡 Road Cracks
+        </button>
+
+        <button class="filter-btn" onclick="showHazards('Waterlogging')">
+            🔵 Waterlogging
+        </button>
+
+        <hr>
+
+        <h2>Amenities</h2>
+
+        <button class="filter-btn" onclick="showAmenities('hospital')">
+            🏥 Hospitals
+        </button>
+
+        <button class="filter-btn" onclick="showAmenities('police')">
+            🚓 Police
+        </button>
+
+        <button class="filter-btn" onclick="showAmenities('petrol')">
+            ⛽ Petrol Pumps
+        </button>
+
+        <button class="filter-btn" onclick="showAmenities('school')">
+            🏫 Schools
+        </button>
+
+    </aside>
+
+
+    <!-- CONTENT -->
+
+    <main class="content">
+
+        <!-- DASHBOARD -->
+
+        <section id="dashboard">
+
+            <div class="page-title">
+                <div>
+                    <h2>Road Safety Dashboard</h2>
+                    <p>Real-time infrastructure monitoring</p>
+                </div>
+
+                <button class="location-btn" onclick="locateUser()">
+                    📍 My Location
+                </button>
+            </div>
+
+
+            <!-- STATISTICS -->
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-icon">🚧</div>
+                    <div>
+                        <p>Total Hazards</p>
+                        <h2 id="totalHazards">0</h2>
+                    </div>
+                </div>
+
+                <div class="stat-card critical">
+                    <div class="stat-icon">🔴</div>
+                    <div>
+                        <p>Critical</p>
+                        <h2 id="criticalCount">0</h2>
+                    </div>
+                </div>
+
+                <div class="stat-card high">
+                    <div class="stat-icon">🟠</div>
+                    <div>
+                        <p>High</p>
+                        <h2 id="highCount">0</h2>
+                    </div>
+                </div>
+
+                <div class="stat-card medium">
+                    <div class="stat-icon">🟡</div>
+                    <div>
+                        <p>Medium</p>
+                        <h2 id="mediumCount">0</h2>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- REPAIR STATUS -->
+
+            <div class="dashboard-grid">
+
+                <div class="panel">
+
+                    <h3>🔧 Repair Status</h3>
+
+                    <div class="progress-item">
+                        <div>
+                            <span>Detected</span>
+                            <b id="detectedCount">0</b>
+                        </div>
+                        <div class="progress">
+                            <div id="detectedBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div>
+                            <span>Reported</span>
+                            <b id="reportedCount">0</b>
+                        </div>
+                        <div class="progress">
+                            <div id="reportedBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div>
+                            <span>Under Repair</span>
+                            <b id="repairCount">0</b>
+                        </div>
+                        <div class="progress">
+                            <div id="repairBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div>
+                            <span>Fixed</span>
+                            <b id="fixedCount">0</b>
+                        </div>
+                        <div class="progress">
+                            <div id="fixedBar"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- MAP -->
+
+                <div class="panel map-panel">
+
+                    <div class="panel-header">
+                        <h3>🗺️ Live Hazard Map</h3>
+
+                        <input
+                            type="text"
+                            id="searchBox"
+                            placeholder="Search location..."
+                        >
+                    </div>
+
+                    <div id="map"></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- HAZARDS -->
+
+        <section id="hazards" class="hidden">
+
+            <div class="page-title">
+                <div>
+                    <h2>Detected Hazards</h2>
+                    <p>Road infrastructure problems detected by MARGIX</p>
+                </div>
+            </div>
+
+            <div class="table-panel">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>Severity</th>
+                            <th>Confidence</th>
+                            <th>Status</th>
+                            <th>Location</th>
+                            <th>Action</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="hazardTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- AMENITIES -->
+
+        <section id="amenities" class="hidden">
+
+            <div class="page-title">
+                <div>
+                    <h2>Nearby Amenities</h2>
+                    <p>Important facilities around detected hazards</p>
+                </div>
+            </div>
+
+            <div class="amenity-grid">
+
+                <div class="amenity-card" onclick="showAmenities('hospital')">
+                    <span>🏥</span>
+                    <h3>Hospitals</h3>
+                    <p>Find nearby hospitals</p>
+                </div>
+
+                <div class="amenity-card" onclick="showAmenities('police')">
+                    <span>🚓</span>
+                    <h3>Police Stations</h3>
+                    <p>Find nearby police stations</p>
+                </div>
+
+                <div class="amenity-card" onclick="showAmenities('petrol')">
+                    <span>⛽</span>
+                    <h3>Petrol Pumps</h3>
+                    <p>Find nearby fuel stations</p>
+                </div>
+
+                <div class="amenity-card" onclick="showAmenities('school')">
+                    <span>🏫</span>
+                    <h3>Schools</h3>
+                    <p>Find nearby schools</p>
+                </div>
+
+            </div>
+
+            <div class="panel amenity-results">
+
+                <h3 id="amenityTitle">
+                    Select an amenity
+                </h3>
+
+                <div id="placesList"></div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <p>
+        MARGIX – Monitoring And Road Guard Intelligence eXchange
+    </p>
+
+    <p>
+        Capture → Detect → Locate → Assess → Report → Resolve
+    </p>
+
+</footer>
+
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
